@@ -6,7 +6,7 @@ exists.
 
 # Requirements
 
-- A working Marvinbot install
+- A working [Marvinbot](https://github.com/BotDevGroup/marvin) install
 
 # Getting Started
 
