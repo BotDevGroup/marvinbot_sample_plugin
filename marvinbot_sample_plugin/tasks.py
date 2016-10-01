@@ -1,4 +1,3 @@
-from marvinbot.core import get_adapter
 from marvinbot.utils import get_message
 from marvinbot.handlers import Filters, CommandHandler, MessageHandler
 from celery.utils.log import get_task_logger
@@ -6,7 +5,7 @@ from celery import task
 from marvinbot_sample_plugin.models import WitnessedUser
 
 log = get_task_logger(__name__)
-adapter = get_adapter()
+adapter = None
 
 
 @task
@@ -47,9 +46,13 @@ def salutation_initiative(update):
     update.message.reply_text("'zup")
 
 
-adapter.add_handler(CommandHandler('witness', witness_command, call_async=True))
-adapter.add_handler(CommandHandler('start', start_command, call_async=True))
-adapter.add_handler(MessageHandler(Filters.photo, gaze_at_pic))
-adapter.add_handler(MessageHandler([Filters.text, lambda msg: msg.text.lower() in ['hola', 'hi', 'klk', 'hey']],
-                                   salutation_initiative,
-                                   strict=True))
+def setup(new_adapter):
+    global adapter
+    adapter = new_adapter
+
+    adapter.add_handler(CommandHandler('witness', witness_command, call_async=True))
+    adapter.add_handler(CommandHandler('start', start_command, call_async=True))
+    adapter.add_handler(MessageHandler(Filters.photo, gaze_at_pic))
+    adapter.add_handler(MessageHandler([Filters.text, lambda msg: msg.text.lower() in ['hola', 'hi', 'klk', 'hey']],
+                                       salutation_initiative,
+                                       strict=True))
