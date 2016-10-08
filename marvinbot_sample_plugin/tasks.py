@@ -1,5 +1,5 @@
 from marvinbot.utils import get_message
-from marvinbot.handlers import Filters, CommandHandler, MessageHandler
+from marvinbot.handlers import CommonFilters, CommandHandler, MessageHandler
 from marvinbot_sample_plugin.models import WitnessedUser
 import logging
 
@@ -51,7 +51,7 @@ def setup(new_adapter):
     adapter.add_handler(CommandHandler('start', start_command, command_description='Does nothing, but takes arguments')
                         .add_argument('--prefix', help='Prepend this to the reply', default='')
                         .add_argument('words', nargs='*', help='Words to put on the reply'))
-    adapter.add_handler(MessageHandler(Filters.photo, gaze_at_pic))
-    adapter.add_handler(MessageHandler([Filters.text, lambda msg: msg.text.lower() in ['hola', 'hi', 'klk', 'hey']],
+    adapter.add_handler(MessageHandler(CommonFilters.photo, gaze_at_pic))
+    adapter.add_handler(MessageHandler([CommonFilters.text, lambda msg: msg.text.lower() in ['hola', 'hi', 'klk', 'hey']],
                                        salutation_initiative,
                                        strict=True))
