@@ -1,14 +1,12 @@
 from marvinbot.utils import get_message
 from marvinbot.handlers import Filters, CommandHandler, MessageHandler
-from celery.utils.log import get_task_logger
-from celery import task
 from marvinbot_sample_plugin.models import WitnessedUser
+import logging
 
-log = get_task_logger(__name__)
+log = logging.getLogger(__name__)
 adapter = None
 
 
-@task
 def witness_command(update, *args):
     message = get_message(update)
     user_data = message.from_user
@@ -25,23 +23,22 @@ def witness_command(update, *args):
         adapter.bot.sendMessage(chat_id=update.message.chat_id, text="Mediocre! (already existed)")
 
 
-@task()
-def start_command(update, *args):
+def start_command(update, *args, **kwargs):
     log.info('Start command caught')
-    adapter.bot.sendMessage(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!: {}".format(args))
+    words = kwargs.get('words')
+    prefix = kwargs.get('prefix')
+    adapter.bot.sendMessage(chat_id=update.message.chat_id,
+                            text="{prefix}I'm a bot, please talk to me!: {words}".format(words=words, prefix=prefix))
 
 
-@task()
 def bowdown(update, *args):
     update.message.reply_text('Yes, master **bows**')
 
 
-@task()
 def gaze_at_pic(update):
     update.message.reply_text('Nice pic, bro')
 
 
-@task()
 def salutation_initiative(update):
     update.message.reply_text("'zup")
 
@@ -50,8 +47,10 @@ def setup(new_adapter):
     global adapter
     adapter = new_adapter
 
-    adapter.add_handler(CommandHandler('witness', witness_command, call_async=True))
-    adapter.add_handler(CommandHandler('start', start_command, call_async=True))
+    adapter.add_handler(CommandHandler('witness', witness_command, command_description='Tell the bot to witness you'))
+    adapter.add_handler(CommandHandler('start', start_command, command_description='Does nothing, but takes arguments')
+                        .add_argument('--prefix', help='Prepend this to the reply', default='')
+                        .add_argument('words', nargs='*', help='Words to put on the reply'))
     adapter.add_handler(MessageHandler(Filters.photo, gaze_at_pic))
     adapter.add_handler(MessageHandler([Filters.text, lambda msg: msg.text.lower() in ['hola', 'hi', 'klk', 'hey']],
                                        salutation_initiative,
