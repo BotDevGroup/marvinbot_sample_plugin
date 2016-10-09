@@ -1,6 +1,8 @@
+from marvinbot.net import fetch_from_telegram
 from marvinbot.utils import get_message
 from marvinbot.handlers import CommonFilters, CommandHandler, MessageHandler
 from marvinbot_sample_plugin.models import WitnessedUser
+import telegram
 import logging
 
 log = logging.getLogger(__name__)
@@ -36,7 +38,15 @@ def bowdown(update, *args):
 
 
 def gaze_at_pic(update):
-    update.message.reply_text('Nice pic, bro')
+    # So the user sees we are doing something
+    adapter.bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.TYPING)
+
+    def photo_responder(filename):
+        log.info('File {} finished downloading, notifying user'.format(filename))
+        update.message.reply_text('Nice pic, bro: {}'.format(filename))
+
+    filename, async = fetch_from_telegram(adapter, update.message.photo[0].file_id,
+                                          on_done=photo_responder)
 
 
 def salutation_initiative(update):
