@@ -45,7 +45,7 @@ def gaze_at_pic(update):
         log.info('File {} finished downloading, notifying user'.format(filename))
         update.message.reply_text('Nice pic, bro: {}'.format(filename))
 
-    filename, async = fetch_from_telegram(adapter, update.message.photo[0].file_id,
+    filename, async = fetch_from_telegram(adapter, update.message.photo[-1].file_id,
                                           on_done=photo_responder)
 
 
