@@ -37,7 +37,17 @@ class SamplePlugin(Plugin):
                                         salutation_initiative,
                                         strict=True))
 
+        self.add_handler(CommandHandler('test', self.you_there,
+                                        command_description="Sends back a simple response")
+                         .add_argument('--foo', help='foo help')
+                         .add_argument('--bar', help='bar help'), 0)
+
     def reload(self, sender, update):
         log.info("Reloading plugin: {}".format(str(sender)))
         if update:
             update.message.reply_text('Reloaded')
+
+    def you_there(self, update, *args, **kwargs):
+        log.info("Responding to you_there: args: %s, kwargs: %s", str(args), str(kwargs))
+        update.message.reply_text('Me here 👀, are _you_? args:"{}", kwargs: "{}"'.format(str(args), str(kwargs)),
+                                  parse_mode='Markdown')
