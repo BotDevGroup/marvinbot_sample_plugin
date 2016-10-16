@@ -28,14 +28,14 @@ class SamplePlugin(Plugin):
         # Subscribe to reload signal, but just for this plugin
         plugin_reload.connect(self.reload, sender=self)
 
-        adapter.add_handler(CommandHandler('witness', witness_command, command_description='Tell the bot to witness you'))
-        adapter.add_handler(CommandHandler('start', start_command, command_description='Does nothing, but takes arguments')
-                            .add_argument('--prefix', help='Prepend this to the reply', default='')
-                            .add_argument('words', nargs='*', help='Words to put on the reply'))
-        adapter.add_handler(MessageHandler(CommonFilters.photo, gaze_at_pic))
-        adapter.add_handler(MessageHandler([CommonFilters.text, lambda msg: msg.text.lower() in ['hola', 'hi', 'klk', 'hey']],
-                                           salutation_initiative,
-                                           strict=True))
+        self.add_handler(CommandHandler('witness', witness_command, command_description='Tell the bot to witness you'))
+        self.add_handler(CommandHandler('start', start_command, command_description='Does nothing, but takes arguments')
+                         .add_argument('--prefix', help='Prepend this to the reply', default='')
+                         .add_argument('words', nargs='*', help='Words to put on the reply'))
+        self.add_handler(MessageHandler(CommonFilters.photo, gaze_at_pic))
+        self.add_handler(MessageHandler([CommonFilters.text, lambda msg: msg.text.lower() in ['hola', 'hi', 'klk', 'hey']],
+                                        salutation_initiative,
+                                        strict=True))
 
     def reload(self, sender, update):
         log.info("Reloading plugin: {}".format(str(sender)))
