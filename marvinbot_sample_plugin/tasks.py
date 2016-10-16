@@ -1,15 +1,14 @@
 from marvinbot.net import fetch_from_telegram
 from marvinbot.utils import get_message
-from marvinbot.handlers import CommonFilters, CommandHandler, MessageHandler
 from marvinbot_sample_plugin.models import WitnessedUser
 import telegram
 import logging
 
 log = logging.getLogger(__name__)
-adapter = None
 
 
 def witness_command(update, *args):
+    adapter = witness_command.plugin.adapter
     message = get_message(update)
     user_data = message.from_user
 
@@ -26,6 +25,7 @@ def witness_command(update, *args):
 
 
 def start_command(update, *args, **kwargs):
+    adapter = start_command.plugin.adapter
     log.info('Start command caught')
     words = kwargs.get('words')
     prefix = kwargs.get('prefix')
@@ -39,6 +39,7 @@ def bowdown(update, *args):
 
 def gaze_at_pic(update):
     # So the user sees we are doing something
+    adapter = gaze_at_pic.plugin.adapter
     adapter.bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.TYPING)
 
     def photo_responder(filename):
@@ -51,17 +52,3 @@ def gaze_at_pic(update):
 
 def salutation_initiative(update):
     update.message.reply_text("'zup")
-
-
-def setup(new_adapter):
-    global adapter
-    adapter = new_adapter
-
-    adapter.add_handler(CommandHandler('witness', witness_command, command_description='Tell the bot to witness you'))
-    adapter.add_handler(CommandHandler('start', start_command, command_description='Does nothing, but takes arguments')
-                        .add_argument('--prefix', help='Prepend this to the reply', default='')
-                        .add_argument('words', nargs='*', help='Words to put on the reply'))
-    adapter.add_handler(MessageHandler(CommonFilters.photo, gaze_at_pic))
-    adapter.add_handler(MessageHandler([CommonFilters.text, lambda msg: msg.text.lower() in ['hola', 'hi', 'klk', 'hey']],
-                                       salutation_initiative,
-                                       strict=True))
