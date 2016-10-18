@@ -4,6 +4,8 @@ from marvinbot_sample_plugin.tasks import (
 from marvinbot.handlers import CommonFilters, CommandHandler, MessageHandler
 from marvinbot.signals import plugin_reload
 from marvinbot.plugins import Plugin
+from marvinbot.utils import localized_date
+from datetime import timedelta
 
 import logging
 
@@ -42,6 +44,18 @@ class SamplePlugin(Plugin):
                          .add_argument('--foo', help='foo help')
                          .add_argument('--bar', help='bar help'), 0)
 
+    def setup_schedules(self, adapter):
+        # See: https://apscheduler.readthedocs.io/en/latest/modules/schedulers/base.html#apscheduler.schedulers.base.BaseScheduler.add_job
+        # Give the job an explicit ID and tell it to replace existing, this avoids
+        # scheduling the same thing several times, as the store is persistent.
+        job = self.adapter.add_job(my_scheduled_func, 'interval', minutes=1,
+                                   id='log something', name='some description',
+                                   replace_existing=True)
+
+        # Schedule cancelling the previous job
+        self.adapter.add_job(cancel_my_scheduled_func, 'date', run_date=localized_date() + timedelta(minutes=5),
+                             args=[job.id])
+
     def reload(self, sender, update):
         log.info("Reloading plugin: {}".format(str(sender)))
         if update:
@@ -51,3 +65,13 @@ class SamplePlugin(Plugin):
         log.info("Responding to you_there: args: %s, kwargs: %s", str(args), str(kwargs))
         update.message.reply_text('Me here 👀, are _you_? args:"{}", kwargs: "{}"'.format(str(args), str(kwargs)),
                                   parse_mode='Markdown')
+
+
+def my_scheduled_func():
+    log.info("my_scheduled_func running")
+
+
+def cancel_my_scheduled_func(job_id):
+    log.info("Cancelliny my_scheduled_func")
+    adapter = cancel_my_scheduled_func.adapter
+    adapter.remove_job(job_id)
