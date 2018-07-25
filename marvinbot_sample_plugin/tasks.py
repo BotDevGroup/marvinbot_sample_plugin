@@ -1,6 +1,7 @@
 from marvinbot.net import fetch_from_telegram
 from marvinbot.utils import get_message
 from marvinbot_sample_plugin.models import WitnessedUser
+from marvinbot.core import get_adapter
 import telegram
 import logging
 
@@ -8,7 +9,7 @@ log = logging.getLogger(__name__)
 
 
 def witness_command(update, *args):
-    adapter = witness_command.plugin.adapter
+    adapter = get_adapter()
     message = get_message(update)
     user_data = message.from_user
 
@@ -25,7 +26,7 @@ def witness_command(update, *args):
 
 
 def start_command(update, *args, **kwargs):
-    adapter = start_command.plugin.adapter
+    adapter = get_adapter()
     log.info('Start command caught')
     words = kwargs.get('words')
     prefix = kwargs.get('prefix')
@@ -39,7 +40,7 @@ def bowdown(update, *args):
 
 def gaze_at_pic(update):
     # So the user sees we are doing something
-    adapter = gaze_at_pic.plugin.adapter
+    adapter = get_adapter()
     adapter.bot.sendChatAction(chat_id=update.message.chat_id, action=telegram.ChatAction.TYPING)
 
     def photo_responder(filename):
