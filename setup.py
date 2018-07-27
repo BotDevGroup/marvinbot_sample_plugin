@@ -2,11 +2,12 @@ from distutils.core import setup
 from setuptools import find_packages
 
 REQUIREMENTS = [
-    'marvinbot'
+    'marvinbot',
+    'flask',
 ]
 
 setup(name='marvinbot-sample-plugin',
-      version='0.1',
+      version='0.2',
       description='A sample plugin',
       author='Ricardo Restituyo',
       author_email='',

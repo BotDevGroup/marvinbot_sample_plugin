@@ -88,6 +88,10 @@ class SamplePlugin(Plugin):
                                          chat_id=query.message.chat_id,
                                          message_id=query.message.message_id)
 
+    def provide_blueprint(self, config):
+        from .views import sample_app
+        return sample_app
+
 
 def my_scheduled_func():
     log.info("my_scheduled_func running")
